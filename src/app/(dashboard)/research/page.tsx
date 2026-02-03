@@ -260,6 +260,7 @@ export default function ResearchPage() {
       if (!reader) throw new Error("응답을 읽을 수 없습니다");
 
       let buffer = "";
+      let finalContent = ""; // 최종 콘텐츠를 로컬에 저장
 
       while (true) {
         const { done, value } = await reader.read();
@@ -285,24 +286,28 @@ export default function ResearchPage() {
 
               if (data.content !== undefined) {
                 // 아티팩트 업데이트
+                finalContent = data.content;
                 setArtifact(data.content);
+                console.log("아티팩트 수신:", data.content.substring(0, 100));
               } else if (data.stage) {
                 // 진행 상태 업데이트
                 setProgress(data);
+                console.log("진행 상태:", data.stage, data.progress);
               }
-            } catch {
-              // JSON 파싱 실패 무시
+            } catch (e) {
+              // JSON 파싱 실패 로그
+              console.log("JSON 파싱 실패:", dataStr.substring(0, 100));
             }
           }
         }
       }
 
-      // 히스토리에 추가
-      if (artifact) {
+      // 히스토리에 추가 (로컬 변수 사용)
+      if (finalContent) {
         const newResult: ResearchResult = {
           id: `research-${Date.now()}`,
           query,
-          content: artifact,
+          content: finalContent,
           depth,
           createdAt: new Date(),
         };
