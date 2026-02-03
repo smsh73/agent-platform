@@ -1,0 +1,58 @@
+{
+  "workflow": {
+    "id": "test-workflow-1",
+    "name": "Simple AI Test Workflow",
+    "description": "Test workflow with LLM node",
+    "nodes": [
+      {
+        "id": "trigger-1",
+        "type": "trigger",
+        "position": { "x": 100, "y": 100 },
+        "data": {
+          "triggerType": "manual",
+          "outputSchema": {
+            "userInput": "string"
+          }
+        }
+      },
+      {
+        "id": "llm-1",
+        "type": "llm",
+        "position": { "x": 300, "y": 100 },
+        "data": {
+          "provider": "openai",
+          "model": "gpt-4o-mini",
+          "prompt": "{{trigger.userInput}}에 대해 간단히 설명해주세요.",
+          "temperature": 0.7,
+          "maxTokens": 200
+        }
+      },
+      {
+        "id": "output-1",
+        "type": "output",
+        "position": { "x": 500, "y": 100 },
+        "data": {
+          "format": "json",
+          "fields": {
+            "result": "{{llm-1.response}}"
+          }
+        }
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge-1",
+        "source": "trigger-1",
+        "target": "llm-1"
+      },
+      {
+        "id": "edge-2",
+        "source": "llm-1",
+        "target": "output-1"
+      }
+    ]
+  },
+  "input": {
+    "userInput": "인공지능"
+  }
+}

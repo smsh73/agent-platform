@@ -1,0 +1,103 @@
+{
+  "slides_example": {
+    "id": "pres-1738590000000",
+    "title": "스타트업 투자 유치 피치덱",
+    "description": "투자자를 위한 스타트업 소개 프레젠테이션",
+    "slides": [
+      {
+        "id": "slide-1",
+        "layout": "title",
+        "contents": [
+          { "type": "title", "value": "NextGen AI Solutions" },
+          { "type": "subtitle", "value": "AI로 비즈니스의 미래를 혁신합니다" }
+        ],
+        "notes": "회사 소개 및 비전 설명"
+      },
+      {
+        "id": "slide-2",
+        "layout": "content",
+        "contents": [
+          { "type": "title", "value": "해결하는 문제" },
+          { "type": "bullets", "value": "기업의 80%가 AI 도입에 어려움을 겪고 있음\n전문 인력 부족으로 AI 프로젝트 실패율 60%\n기존 솔루션은 비용이 너무 높음" }
+        ],
+        "notes": "시장의 pain point 설명"
+      },
+      {
+        "id": "slide-3",
+        "layout": "content",
+        "contents": [
+          { "type": "title", "value": "우리의 솔루션" },
+          { "type": "bullets", "value": "No-Code AI 플랫폼으로 누구나 쉽게 AI 에이전트 구축\n기존 대비 90% 비용 절감\n1주일 내 도입 가능" }
+        ],
+        "notes": "솔루션의 차별점 강조"
+      },
+      {
+        "id": "slide-4",
+        "layout": "content",
+        "contents": [
+          { "type": "title", "value": "시장 기회" },
+          { "type": "bullets", "value": "글로벌 AI 시장 규모: $150B (2024)\n연평균 성장률: 37.3%\n타겟 시장(SMB): $25B" }
+        ],
+        "notes": "TAM/SAM/SOM 설명"
+      },
+      {
+        "id": "slide-5",
+        "layout": "content",
+        "contents": [
+          { "type": "title", "value": "비즈니스 모델" },
+          { "type": "bullets", "value": "SaaS 구독 모델 (월 $99 ~ $999)\n사용량 기반 과금\n엔터프라이즈 맞춤 계약" }
+        ],
+        "notes": "수익 모델 설명"
+      },
+      {
+        "id": "slide-6",
+        "layout": "title",
+        "contents": [
+          { "type": "title", "value": "감사합니다" },
+          { "type": "subtitle", "value": "Q&A | contact@nextgenai.com" }
+        ],
+        "notes": "마무리 및 연락처"
+      }
+    ],
+    "theme": {
+      "id": "modern-dark",
+      "name": "모던 다크",
+      "primaryColor": "#3B82F6",
+      "secondaryColor": "#8B5CF6",
+      "backgroundColor": "#0F172A",
+      "textColor": "#F8FAFC",
+      "accentColor": "#22D3EE"
+    }
+  },
+  "sheets_example": {
+    "id": "spreadsheet-1738590000000",
+    "title": "2024년 글로벌 전기차 판매량 TOP 10",
+    "description": "2024년 전 세계 전기차 브랜드별 판매량 순위",
+    "sheets": [
+      {
+        "id": "sheet-1",
+        "name": "Sheet 1",
+        "columns": [
+          { "id": "rank", "name": "순위", "type": "number", "width": 80 },
+          { "id": "brand", "name": "브랜드", "type": "text", "width": 120 },
+          { "id": "model", "name": "대표 모델", "type": "text", "width": 150 },
+          { "id": "sales", "name": "판매량(만대)", "type": "number", "width": 120 },
+          { "id": "marketShare", "name": "시장 점유율", "type": "text", "width": 100 },
+          { "id": "country", "name": "본사 국가", "type": "text", "width": 100 }
+        ],
+        "rows": [
+          { "id": "row-1", "cells": { "rank": { "type": "number", "value": 1 }, "brand": { "type": "text", "value": "BYD" }, "model": { "type": "text", "value": "Seal, Dolphin" }, "sales": { "type": "number", "value": 302 }, "marketShare": { "type": "text", "value": "21.5%" }, "country": { "type": "text", "value": "중국" } } },
+          { "id": "row-2", "cells": { "rank": { "type": "number", "value": 2 }, "brand": { "type": "text", "value": "Tesla" }, "model": { "type": "text", "value": "Model Y, Model 3" }, "sales": { "type": "number", "value": 180 }, "marketShare": { "type": "text", "value": "12.8%" }, "country": { "type": "text", "value": "미국" } } },
+          { "id": "row-3", "cells": { "rank": { "type": "number", "value": 3 }, "brand": { "type": "text", "value": "Volkswagen" }, "model": { "type": "text", "value": "ID.4, ID.3" }, "sales": { "type": "number", "value": 85 }, "marketShare": { "type": "text", "value": "6.0%" }, "country": { "type": "text", "value": "독일" } } },
+          { "id": "row-4", "cells": { "rank": { "type": "number", "value": 4 }, "brand": { "type": "text", "value": "SAIC-GM-Wuling" }, "model": { "type": "text", "value": "Mini EV" }, "sales": { "type": "number", "value": 78 }, "marketShare": { "type": "text", "value": "5.5%" }, "country": { "type": "text", "value": "중국" } } },
+          { "id": "row-5", "cells": { "rank": { "type": "number", "value": 5 }, "brand": { "type": "text", "value": "GAC Aion" }, "model": { "type": "text", "value": "Aion S, Aion Y" }, "sales": { "type": "number", "value": 65 }, "marketShare": { "type": "text", "value": "4.6%" }, "country": { "type": "text", "value": "중국" } } },
+          { "id": "row-6", "cells": { "rank": { "type": "number", "value": 6 }, "brand": { "type": "text", "value": "Hyundai" }, "model": { "type": "text", "value": "IONIQ 5, IONIQ 6" }, "sales": { "type": "number", "value": 52 }, "marketShare": { "type": "text", "value": "3.7%" }, "country": { "type": "text", "value": "한국" } } },
+          { "id": "row-7", "cells": { "rank": { "type": "number", "value": 7 }, "brand": { "type": "text", "value": "Geely" }, "model": { "type": "text", "value": "Zeekr 001" }, "sales": { "type": "number", "value": 48 }, "marketShare": { "type": "text", "value": "3.4%" }, "country": { "type": "text", "value": "중국" } } },
+          { "id": "row-8", "cells": { "rank": { "type": "number", "value": 8 }, "brand": { "type": "text", "value": "BMW" }, "model": { "type": "text", "value": "iX, i4" }, "sales": { "type": "number", "value": 45 }, "marketShare": { "type": "text", "value": "3.2%" }, "country": { "type": "text", "value": "독일" } } },
+          { "id": "row-9", "cells": { "rank": { "type": "number", "value": 9 }, "brand": { "type": "text", "value": "Mercedes-Benz" }, "model": { "type": "text", "value": "EQS, EQE" }, "sales": { "type": "number", "value": 42 }, "marketShare": { "type": "text", "value": "3.0%" }, "country": { "type": "text", "value": "독일" } } },
+          { "id": "row-10", "cells": { "rank": { "type": "number", "value": 10 }, "brand": { "type": "text", "value": "Kia" }, "model": { "type": "text", "value": "EV6, EV9" }, "sales": { "type": "number", "value": 38 }, "marketShare": { "type": "text", "value": "2.7%" }, "country": { "type": "text", "value": "한국" } } }
+        ]
+      }
+    ]
+  }
+}
