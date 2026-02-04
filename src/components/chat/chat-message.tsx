@@ -1,7 +1,7 @@
 "use client";
 
 import { MessageCircle, User, Copy, Check } from "lucide-react";
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import ReactMarkdown from "react-markdown";
 
 import { cn } from "@/lib/utils";
@@ -14,18 +14,18 @@ interface ChatMessageProps {
   isStreaming?: boolean;
 }
 
-export function ChatMessage({
+export const ChatMessage = memo(function ChatMessage({
   role,
   content,
   isStreaming = false,
 }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = async () => {
+  const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
+  }, [content]);
 
   const isUser = role === "user";
 
@@ -110,4 +110,11 @@ export function ChatMessage({
       </div>
     </div>
   );
-}
+}, (prevProps, nextProps) => {
+  // Custom comparison: only re-render if content or streaming state changes
+  return (
+    prevProps.content === nextProps.content &&
+    prevProps.isStreaming === nextProps.isStreaming &&
+    prevProps.role === nextProps.role
+  );
+});
