@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Bot, Search, MoreHorizontal, Play, Presentation, FileSearch, FileSpreadsheet, Sparkles, ArrowRight, Zap } from "lucide-react";
+import { Plus, MessageSquare, Search, MoreHorizontal, Play, Presentation, FileSearch, FileSpreadsheet, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -79,7 +79,7 @@ const superAgents = [
     id: "moa",
     name: "Mixture of Agents",
     description: "GPT-4o, Claude, Gemini가 동시에 응답하고 최고의 답변을 조합합니다",
-    icon: Zap,
+    icon: FileSearch,
     href: "/chat?moa=true",
     color: "from-yellow-500 to-orange-500",
     features: ["멀티 AI 동시 실행", "응답 분석 & 선별", "최신 정보 검색", "Best Answer 합성"],
@@ -149,7 +149,7 @@ export default function AgentsPage() {
       {/* Super Agents */}
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="h-5 w-5 text-primary" />
+          <FileSearch className="h-5 w-5 text-primary" />
           <h2 className="text-lg font-semibold">Super Agent</h2>
           <Badge variant="secondary">New</Badge>
         </div>

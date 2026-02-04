@@ -1,6 +1,6 @@
 "use client";
 
-import { Check, ChevronsUpDown, Sparkles } from "lucide-react";
+import { Check, ChevronsUpDown, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -73,7 +73,7 @@ export function ModelSelector({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="gap-2">
-          <Sparkles className="h-4 w-4" />
+          <Settings className="h-4 w-4" />
           <span className="hidden sm:inline">{currentModel.name}</span>
           <Badge
             variant="secondary"

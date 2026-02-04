@@ -2,7 +2,7 @@
 
 import { memo } from "react";
 import { Handle, Position, NodeProps } from "@xyflow/react";
-import { Brain } from "lucide-react";
+import { FileText } from "lucide-react";
 
 export const LLMNode = memo(function LLMNode({ data }: NodeProps) {
   return (
@@ -13,7 +13,7 @@ export const LLMNode = memo(function LLMNode({ data }: NodeProps) {
         className="w-3 h-3 !bg-purple-500"
       />
       <div className="flex items-center gap-2 px-3 py-2 bg-purple-500 text-white rounded-t-md">
-        <Brain className="h-4 w-4" />
+        <FileText className="h-4 w-4" />
         <span className="text-sm font-medium">{data.label as string}</span>
       </div>
       <div className="p-3 space-y-1">

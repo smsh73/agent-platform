@@ -3,7 +3,6 @@
 import { useState, useRef } from "react";
 import {
   Table,
-  Sparkles,
   Download,
   Plus,
   Trash2,
@@ -413,7 +412,7 @@ export default function SheetsPage() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="h-4 w-4 mr-2" />
+                    <FileSpreadsheet className="h-4 w-4 mr-2" />
                     AI로 시트 생성
                   </>
                 )}

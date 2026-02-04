@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   MessageSquare,
-  Bot,
+  Menu,
   Blocks,
   Store,
   Settings,
   LogOut,
   ChevronUp,
-  Sparkles,
+  Home,
   Presentation,
   FileSearch,
   FileSpreadsheet,
@@ -45,7 +45,7 @@ const navItems = [
   {
     title: "에이전트",
     href: "/agents",
-    icon: Bot,
+    icon: Menu,
   },
   {
     title: "AI 슬라이드",
@@ -101,7 +101,7 @@ export function AppSidebar({ user }: AppSidebarProps) {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/chat">
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Sparkles className="size-4" />
+                  <Home className="size-4" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-semibold">Agent Platform</span>

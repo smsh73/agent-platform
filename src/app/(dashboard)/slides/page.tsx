@@ -10,7 +10,6 @@ import {
   Download,
   Plus,
   Loader2,
-  Sparkles,
   Check,
   Search,
   FileBarChart,
@@ -192,7 +191,7 @@ function GenerationProgress({
   };
 
   const stageIcons: Record<string, React.ReactNode> = {
-    analyzing: <Sparkles className="h-4 w-4" />,
+    analyzing: <Presentation className="h-4 w-4" />,
     "researching-topic": <Search className="h-4 w-4" />,
     "creating-outline": <FileBarChart className="h-4 w-4" />,
     "planning-slides": <Layout className="h-4 w-4" />,
@@ -472,7 +471,7 @@ export default function SlidesPage() {
                   </>
                 ) : (
                   <>
-                    <Sparkles className="mr-2 h-4 w-4" />
+                    <Presentation className="mr-2 h-4 w-4" />
                     슬라이드 생성
                   </>
                 )}

@@ -7,7 +7,6 @@ import {
   Users,
   Key,
   BarChart3,
-  Bot,
   Settings,
   Shield,
   ArrowLeft,
@@ -53,7 +52,6 @@ const adminNavItems = [
   {
     title: "Agents",
     href: "/admin/agents",
-    icon: Bot,
   },
 ];
 

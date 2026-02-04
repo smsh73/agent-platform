@@ -5,7 +5,6 @@ import {
   Search,
   Loader2,
   FileText,
-  Zap,
   Layers,
   BookOpen,
   Download,
@@ -13,7 +12,6 @@ import {
   Check,
   History,
   Trash2,
-  Sparkles,
   Eye,
   Maximize2,
   X,
@@ -71,7 +69,7 @@ const DEPTH_OPTIONS = [
   {
     id: "quick",
     name: "퀵 리서치",
-    icon: Zap,
+    icon: FileText,
     description: "빠른 핵심 요약",
     time: "~1분",
   },
@@ -384,7 +382,7 @@ export default function ResearchPage() {
         <div className="border-b p-6">
           <div className="max-w-2xl mx-auto space-y-4">
             <div className="flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-primary" />
+              <Search className="h-6 w-6 text-primary" />
               <h1 className="text-2xl font-bold">Agentic Research</h1>
             </div>
             <p className="text-sm text-muted-foreground">

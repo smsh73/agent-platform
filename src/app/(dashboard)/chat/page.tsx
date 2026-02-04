@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, Suspense, useState } from "react";
-import { Plus, History, Trash2, Bot, Sparkles, ChevronDown, ChevronUp, Zap } from "lucide-react";
+import { Plus, History, Trash2, MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -35,7 +35,7 @@ function MoAAnalysisPanel({ message }: { message: Message }) {
       <CollapsibleTrigger asChild>
         <Button variant="outline" size="sm" className="w-full justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" />
+            <MessageSquare className="h-4 w-4 text-primary" />
             <span>Mixture of Agents 분석 결과</span>
             <Badge variant="secondary" className="text-xs">
               {moaResult.totalLatency}ms
@@ -184,7 +184,7 @@ function ChatContent() {
         <div className="flex items-center gap-2">
           {currentAgent ? (
             <Badge variant="secondary" className="flex items-center gap-1 py-1.5 px-3">
-              <Bot className="h-3 w-3" />
+              <MessageSquare className="h-3 w-3" />
               {currentAgent.name}
             </Badge>
           ) : null}
@@ -214,7 +214,7 @@ function ChatContent() {
                       isMoAMode ? "text-primary" : "text-muted-foreground"
                     }`}
                   >
-                    <Zap className="h-3 w-3" />
+                    <MessageSquare className="h-3 w-3" />
                     MoA
                   </label>
                 </div>
@@ -256,7 +256,7 @@ function ChatContent() {
               {isMoAMode ? (
                 <>
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 text-3xl">
-                    <Zap className="h-8 w-8 text-white" />
+                    <MessageSquare className="h-8 w-8 text-white" />
                   </div>
                   <h2 className="text-2xl font-bold">Mixture of Agents</h2>
                   <p className="mt-2 text-muted-foreground max-w-md">
@@ -274,7 +274,7 @@ function ChatContent() {
               ) : currentAgent ? (
                 <>
                   <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-3xl">
-                    <Bot className="h-8 w-8 text-primary" />
+                    <MessageSquare className="h-8 w-8 text-primary" />
                   </div>
                   <h2 className="text-2xl font-bold">{currentAgent.name}</h2>
                   <p className="mt-2 text-muted-foreground">

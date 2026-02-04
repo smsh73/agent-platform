@@ -1,6 +1,6 @@
 "use client";
 
-import { Bot, User, Copy, Check } from "lucide-react";
+import { MessageCircle, User, Copy, Check } from "lucide-react";
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 
@@ -44,7 +44,7 @@ export function ChatMessage({
               : "bg-secondary text-secondary-foreground"
           )}
         >
-          {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+          {isUser ? <User className="h-4 w-4" /> : <MessageCircle className="h-4 w-4" />}
         </AvatarFallback>
       </Avatar>
 
