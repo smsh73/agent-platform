@@ -410,6 +410,34 @@ export default function SlidesPage() {
           {!presentation ? (
             // 생성 패널
             <div className="p-4 space-y-4">
+              {/* 트렌딩 주제 */}
+              <div className="p-3 rounded-lg border bg-gradient-to-r from-primary/5 to-purple/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <FileBarChart className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-medium">오늘의 트렌딩 주제</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { topic: "Davos 2026", icon: "🏔️" },
+                    { topic: "Elon Musk AI", icon: "🤖" },
+                    { topic: "AI Agent Market 2026", icon: "📈" },
+                    { topic: "AGI Breakthrough", icon: "🧠" },
+                    { topic: "Quantum Computing", icon: "⚛️" },
+                    { topic: "Climate Tech", icon: "🌍" },
+                  ].map(({ topic, icon }) => (
+                    <Button
+                      key={topic}
+                      variant="outline"
+                      size="sm"
+                      className="text-xs h-7 hover:bg-primary/10"
+                      onClick={() => setPrompt(`${topic}에 대한 종합 분석 프레젠테이션을 만들어주세요. 최신 동향, 핵심 데이터, 미래 전망을 포함해주세요.`)}
+                    >
+                      {icon} {topic}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <label className="text-sm font-medium mb-2 block">
                   프레젠테이션 주제

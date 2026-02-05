@@ -17,6 +17,7 @@ import {
   Settings,
 } from "lucide-react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -323,15 +324,34 @@ export default function SheetsPage() {
         </div>
         {spreadsheet && (
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={copyToClipboard}>
-              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyToClipboard}
+              aria-label="클립보드에 복사"
+            >
+              {copied ? (
+                <Check className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Copy className="h-4 w-4" aria-hidden="true" />
+              )}
             </Button>
-            <Button variant="outline" size="sm" onClick={exportCSV}>
-              <Download className="h-4 w-4 mr-1" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={exportCSV}
+              aria-label="CSV 파일로 내보내기"
+            >
+              <Download className="h-4 w-4 mr-1" aria-hidden="true" />
               CSV
             </Button>
-            <Button variant="outline" size="sm" onClick={addRow}>
-              <Plus className="h-4 w-4 mr-1" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={addRow}
+              aria-label="행 추가"
+            >
+              <Plus className="h-4 w-4 mr-1" aria-hidden="true" />
               행 추가
             </Button>
           </div>
@@ -502,14 +522,25 @@ export default function SheetsPage() {
                           </td>
                         ))}
                         <td className="border-b">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6 opacity-0 group-hover:opacity-100"
-                            onClick={() => deleteRow(rowIndex)}
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </Button>
+                          <ConfirmDialog
+                            title="행 삭제"
+                            description="이 행을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+                            confirmText="삭제"
+                            variant="destructive"
+                            onConfirm={async () => {
+                              deleteRow(rowIndex);
+                            }}
+                            trigger={
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 opacity-0 group-hover:opacity-100"
+                                aria-label={`${rowIndex + 1}번째 행 삭제`}
+                              >
+                                <Trash2 className="h-3 w-3" aria-hidden="true" />
+                              </Button>
+                            }
+                          />
                         </td>
                       </tr>
                     ))}

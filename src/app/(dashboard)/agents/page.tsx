@@ -1,6 +1,7 @@
 "use client";
 
-import { Plus, MessageSquare, Search, MoreHorizontal, Play, Presentation, FileSearch, FileSpreadsheet, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Plus, Search, MoreHorizontal, Play, Presentation, FileSearch, FileSpreadsheet, ArrowRight, Loader2, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -21,50 +22,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-// Mock data - will be replaced with actual data
-const agents = [
-  {
-    id: "1",
-    name: "리서치 어시스턴트",
-    description: "자율 웹 리서치 및 보고서 생성",
-    icon: "🔍",
-    model: "gpt-4o",
-    provider: "openai",
-    usageCount: 156,
-    isPublic: false,
-  },
-  {
-    id: "2",
-    name: "코드 리뷰어",
-    description: "코드 검토 및 개선 제안",
-    icon: "👨‍💻",
-    model: "claude-3-5-sonnet-latest",
-    provider: "anthropic",
-    usageCount: 89,
-    isPublic: true,
-  },
-  {
-    id: "3",
-    name: "콘텐츠 작가",
-    description: "블로그, 기사, 소셜 미디어 콘텐츠 작성",
-    icon: "✍️",
-    model: "gpt-4o",
-    provider: "openai",
-    usageCount: 234,
-    isPublic: false,
-  },
-  {
-    id: "4",
-    name: "데이터 분석가",
-    description: "데이터 분석 및 시각화 생성",
-    icon: "📊",
-    model: "gemini-1.5-pro",
-    provider: "google",
-    usageCount: 67,
-    isPublic: false,
-  },
-];
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import type { Agent } from "@/types/agents";
 
 const PROVIDER_COLORS: Record<string, string> = {
   openai: "bg-green-500/10 text-green-600",
@@ -115,18 +74,65 @@ const superAgents = [
 
 export default function AgentsPage() {
   const router = useRouter();
+  const [agents, setAgents] = useState<Agent[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const handleRunAgent = (agent: typeof agents[0]) => {
-    // 에이전트 정보를 세션 스토리지에 저장하고 채팅 페이지로 이동
-    sessionStorage.setItem("selectedAgent", JSON.stringify({
-      id: agent.id,
-      name: agent.name,
-      model: agent.model,
-      systemPrompt: `당신은 "${agent.name}"입니다. ${agent.description}을 수행하는 AI 어시스턴트입니다. 사용자의 요청에 따라 최선을 다해 도와주세요.`,
-    }));
+  useEffect(() => {
+    loadAgents();
+  }, []);
+
+  const loadAgents = async () => {
+    try {
+      const res = await fetch("/api/agents");
+      const data = await res.json();
+      if (data.success) {
+        setAgents(data.agents);
+      }
+    } catch (error) {
+      toast.error("에이전트 로딩 실패");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRunAgent = (agent: Agent) => {
+    sessionStorage.setItem(
+      "selectedAgent",
+      JSON.stringify({
+        id: agent.id,
+        name: agent.name,
+        model: agent.model,
+        systemPrompt: agent.systemPrompt,
+      })
+    );
     toast.success(`${agent.name} 에이전트를 시작합니다`);
     router.push(`/chat?agent=${agent.id}`);
   };
+
+  const handleUninstall = async (agentId: string) => {
+    try {
+      const res = await fetch(`/api/agents?id=${agentId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        toast.success(data.message);
+        setAgents((prev) => prev.filter((a) => a.id !== agentId));
+      } else {
+        toast.error(data.error || "제거 실패");
+      }
+    } catch (error) {
+      toast.error("에이전트 제거 중 오류 발생");
+    }
+  };
+
+  const filteredAgents = agents.filter(
+    (agent) =>
+      searchQuery === "" ||
+      agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.description.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="p-6">
@@ -139,9 +145,9 @@ export default function AgentsPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/builder">
+          <Link href="/marketplace">
             <Plus className="mr-2 h-4 w-4" />
-            에이전트 만들기
+            에이전트 설치
           </Link>
         </Button>
       </div>
@@ -157,10 +163,14 @@ export default function AgentsPage() {
           {superAgents.map((agent) => (
             <Link key={agent.id} href={agent.href}>
               <Card className="group relative overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-                <div className={`absolute inset-0 bg-gradient-to-br ${agent.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${agent.color} opacity-5 group-hover:opacity-10 transition-opacity`}
+                />
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${agent.color}`}>
+                    <div
+                      className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${agent.color}`}
+                    >
                       <agent.icon className="h-6 w-6 text-white" />
                     </div>
                     <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -185,28 +195,48 @@ export default function AgentsPage() {
 
       {/* Search */}
       <div className="mb-6 flex items-center gap-4">
-        <h2 className="text-lg font-semibold">내 에이전트</h2>
+        <h2 className="text-lg font-semibold">설치된 에이전트</h2>
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="에이전트 검색..." className="pl-9" />
+          <Input
+            placeholder="에이전트 검색..."
+            className="pl-9"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
       </div>
 
       {/* Agents Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {agents.map((agent) => (
-          <Card
-            key={agent.id}
-            className="group relative overflow-hidden transition-shadow hover:shadow-md"
-          >
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-xl">
-                    {agent.icon}
-                  </div>
-                  <div>
-                    <CardTitle className="text-base">{agent.name}</CardTitle>
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+      ) : filteredAgents.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground mb-4">
+            {searchQuery
+              ? "검색 결과가 없습니다"
+              : "설치된 에이전트가 없습니다"}
+          </p>
+          <Button asChild>
+            <Link href="/marketplace">
+              <Plus className="mr-2 h-4 w-4" />
+              마켓플레이스에서 설치하기
+            </Link>
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredAgents.map((agent) => (
+            <Card
+              key={agent.id}
+              className="group relative overflow-hidden transition-shadow hover:shadow-md"
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <CardTitle className="text-base mb-1">{agent.name}</CardTitle>
                     <Badge
                       variant="secondary"
                       className={PROVIDER_COLORS[agent.provider]}
@@ -214,67 +244,70 @@ export default function AgentsPage() {
                       {agent.model}
                     </Badge>
                   </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100"
+                        aria-label="에이전트 메뉴"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>편집</DropdownMenuItem>
+                      <DropdownMenuItem>복제</DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={async (e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <ConfirmDialog
+                          title="에이전트 제거"
+                          description={`"${agent.name}"을(를) 제거하시겠습니까?`}
+                          confirmText="제거"
+                          variant="destructive"
+                          onConfirm={async () => {
+                            await handleUninstall(agent.id);
+                          }}
+                          trigger={
+                            <div className="flex items-center text-destructive w-full cursor-pointer">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              제거
+                            </div>
+                          }
+                        />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="line-clamp-2 mb-4">
+                  {agent.description}
+                </CardDescription>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">
+                    {agent.usageCount || 0}회 사용
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {agent.isPublic && (
+                      <Badge variant="outline" className="text-xs">
+                        공개
+                      </Badge>
+                    )}
+                    <Button size="sm" onClick={() => handleRunAgent(agent)}>
+                      <Play className="mr-1 h-3 w-3" />
+                      실행
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>편집</DropdownMenuItem>
-                    <DropdownMenuItem>복제</DropdownMenuItem>
-                    <DropdownMenuItem>공유</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">
-                      삭제
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <CardDescription className="line-clamp-2 mb-4">
-                {agent.description}
-              </CardDescription>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">
-                  {agent.usageCount}회 사용
-                </span>
-                <div className="flex items-center gap-2">
-                  {agent.isPublic && (
-                    <Badge variant="outline" className="text-xs">
-                      공개
-                    </Badge>
-                  )}
-                  <Button size="sm" onClick={() => handleRunAgent(agent)}>
-                    <Play className="mr-1 h-3 w-3" />
-                    실행
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-
-        {/* Create New Card */}
-        <Link href="/builder">
-          <Card className="flex h-full min-h-[180px] cursor-pointer items-center justify-center border-dashed transition-colors hover:border-primary hover:bg-muted/50">
-            <div className="text-center">
-              <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                <Plus className="h-5 w-5 text-primary" />
-              </div>
-              <p className="font-medium">새 에이전트 만들기</p>
-              <p className="text-sm text-muted-foreground">
-                비주얼 에디터로 빌드
-              </p>
-            </div>
-          </Card>
-        </Link>
-      </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

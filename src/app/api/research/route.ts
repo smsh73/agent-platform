@@ -2,6 +2,7 @@ import { generateText } from "ai";
 import { auth } from "@/lib/auth";
 import { getApiKey } from "@/lib/ai/get-api-key";
 import { getModelWithKey } from "@/lib/ai/providers";
+import { validatePrompt } from "@/lib/security/prompt-validator";
 
 export const maxDuration = 300; // 5분 타임아웃
 
@@ -339,6 +340,17 @@ export async function POST(req: Request) {
       return Response.json({ error: "검색 질문을 입력해주세요" }, { status: 400 });
     }
 
+    // Validate query for prompt injection
+    let sanitizedQuery: string;
+    try {
+      sanitizedQuery = validatePrompt(query, { strict: true });
+    } catch (error) {
+      return Response.json(
+        { error: "Your query contains patterns that could be harmful. Please rephrase your request." },
+        { status: 400 }
+      );
+    }
+
     const { stream, sendProgress, sendArtifact, close } = createSSEStream();
 
     // 비동기 협업 워크플로우 실행
@@ -355,7 +367,7 @@ export async function POST(req: Request) {
         });
 
         const queryCount = depth === "quick" ? 2 : depth === "standard" ? 4 : 6;
-        const perplexityData = await perplexityDataCollection(query, depth, userId);
+        const perplexityData = await perplexityDataCollection(sanitizedQuery, depth, userId);
 
         const successCount = perplexityData.filter((d) => d).length;
         sendProgress({
@@ -378,7 +390,7 @@ export async function POST(req: Request) {
         });
 
         const { outline, verifiedData } = await openaiVerifyAndOutline(
-          query,
+          sanitizedQuery,
           perplexityData,
           depth,
           userId
@@ -406,7 +418,7 @@ export async function POST(req: Request) {
           progress: 45,
         });
 
-        const geminiData = await geminiCrawlAndSearch(query, outline, userId);
+        const geminiData = await geminiCrawlAndSearch(sanitizedQuery, outline, userId);
 
         sendProgress({
           stage: "gemini",
@@ -428,7 +440,7 @@ export async function POST(req: Request) {
         });
 
         const draft = await openaiDraftReport(
-          query,
+          sanitizedQuery,
           outline,
           verifiedData,
           geminiData,
@@ -458,7 +470,7 @@ export async function POST(req: Request) {
           progress: 85,
         });
 
-        const finalReport = await claudeNarrative(query, draft, outline, userId);
+        const finalReport = await claudeNarrative(sanitizedQuery, draft, outline, userId);
 
         sendProgress({
           stage: "complete",

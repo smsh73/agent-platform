@@ -1,6 +1,8 @@
 "use client";
 
-import { Search, Star, Download, Filter, TrendingUp } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Star, Download, Filter, TrendingUp, Plus, Check, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,81 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-const featuredAgents = [
-  {
-    id: "1",
-    name: "리서치 프로",
-    description:
-      "여러 소스를 검색하고 데이터를 분석하여 종합 보고서를 작성하는 고급 리서치 에이전트입니다.",
-    icon: "🔬",
-    author: "Agent Platform",
-    rating: 4.9,
-    downloads: 15420,
-    category: "리서치",
-    isVerified: true,
-  },
-  {
-    id: "2",
-    name: "코드 어시스턴트",
-    description:
-      "코드 리뷰, 디버깅, 문서화 기능을 갖춘 풀스택 개발 어시스턴트입니다.",
-    icon: "💻",
-    author: "DevTools Inc",
-    rating: 4.8,
-    downloads: 12350,
-    category: "개발",
-    isVerified: true,
-  },
-  {
-    id: "3",
-    name: "콘텐츠 크리에이터",
-    description:
-      "블로그 포스트, 소셜 미디어 콘텐츠, 이메일 캠페인, 마케팅 카피를 생성합니다.",
-    icon: "✍️",
-    author: "Marketing AI",
-    rating: 4.7,
-    downloads: 9870,
-    category: "마케팅",
-    isVerified: true,
-  },
-  {
-    id: "4",
-    name: "데이터 분석가",
-    description:
-      "데이터셋을 분석하고 시각화를 생성하며 자동으로 인사이트를 도출합니다.",
-    icon: "📊",
-    author: "DataWiz",
-    rating: 4.6,
-    downloads: 7650,
-    category: "분석",
-    isVerified: false,
-  },
-  {
-    id: "5",
-    name: "고객 지원",
-    description:
-      "고객 문의를 처리하고 문제를 해결하며 필요시 에스컬레이션합니다.",
-    icon: "🎧",
-    author: "SupportAI",
-    rating: 4.5,
-    downloads: 6420,
-    category: "지원",
-    isVerified: true,
-  },
-  {
-    id: "6",
-    name: "법률 어시스턴트",
-    description:
-      "계약서를 검토하고 법률 문서를 요약하며 컴플라이언스 체크를 제공합니다.",
-    icon: "⚖️",
-    author: "LegalTech",
-    rating: 4.4,
-    downloads: 4320,
-    category: "법률",
-    isVerified: true,
-  },
-];
+import type { MarketplaceAgent } from "@/types/agents";
 
 const categories = [
   "전체",
@@ -102,6 +30,105 @@ const categories = [
 ];
 
 export default function MarketplacePage() {
+  const [agents, setAgents] = useState<MarketplaceAgent[]>([]);
+  const [installedAgents, setInstalledAgents] = useState<Set<string>>(new Set());
+  const [installing, setInstalling] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("전체");
+
+  // Load marketplace agents
+  useEffect(() => {
+    loadMarketplaceAgents();
+    loadInstalledAgents();
+  }, []);
+
+  const loadMarketplaceAgents = async () => {
+    try {
+      const res = await fetch("/api/agents/marketplace?featured=true");
+      const data = await res.json();
+      if (data.success) {
+        setAgents(data.agents);
+      }
+    } catch (error) {
+      toast.error("마켓플레이스 로딩 실패");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadInstalledAgents = async () => {
+    try {
+      const res = await fetch("/api/agents");
+      const data = await res.json();
+      if (data.success) {
+        const installed = new Set<string>(data.agents.map((a: any) => a.id as string));
+        setInstalledAgents(installed);
+      }
+    } catch (error) {
+      // User might not be logged in
+      console.error("Failed to load installed agents:", error);
+    }
+  };
+
+  const handleInstall = async (agent: MarketplaceAgent) => {
+    setInstalling(agent.id);
+    try {
+      const res = await fetch("/api/agents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agentId: agent.id,
+          type: "install",
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success(data.message);
+        setInstalledAgents((prev) => new Set([...prev, agent.id]));
+
+        // Update downloads count
+        setAgents((prev) =>
+          prev.map((a) =>
+            a.id === agent.id ? { ...a, downloads: a.downloads + 1 } : a
+          )
+        );
+      } else {
+        toast.error(data.error || "설치 실패");
+      }
+    } catch (error) {
+      toast.error("에이전트 설치 중 오류 발생");
+    } finally {
+      setInstalling(null);
+    }
+  };
+
+  const filteredAgents = agents.filter((agent) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const categoryMap: Record<string, string> = {
+      "리서치": "research",
+      "개발": "development",
+      "마케팅": "marketing",
+      "분석": "analytics",
+      "지원": "support",
+      "법률": "legal",
+      "금융": "finance",
+      "인사": "hr",
+    };
+
+    const matchesCategory =
+      selectedCategory === "전체" ||
+      agent.category === categoryMap[selectedCategory];
+
+    return matchesSearch && matchesCategory;
+  });
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -116,16 +143,22 @@ export default function MarketplacePage() {
       <div className="mb-6 flex items-center gap-4">
         <div className="relative flex-1 max-w-xl">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="에이전트 검색..." className="pl-9" />
+          <Input
+            placeholder="에이전트 검색..."
+            className="pl-9"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-        <Button variant="outline">
-          <Filter className="mr-2 h-4 w-4" />
-          필터
-        </Button>
       </div>
 
       {/* Categories */}
-      <Tabs defaultValue="전체" className="mb-6">
+      <Tabs
+        defaultValue="전체"
+        value={selectedCategory}
+        onValueChange={setSelectedCategory}
+        className="mb-6"
+      >
         <TabsList className="flex-wrap h-auto gap-2 bg-transparent p-0">
           {categories.map((category) => (
             <TabsTrigger
@@ -145,57 +178,106 @@ export default function MarketplacePage() {
           <TrendingUp className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-semibold">추천 에이전트</h2>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredAgents.map((agent) => (
-            <Card
-              key={agent.id}
-              className="group cursor-pointer transition-shadow hover:shadow-md"
-            >
-              <CardHeader className="pb-2">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-muted text-2xl">
-                      {agent.icon}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-base">
-                          {agent.name}
-                        </CardTitle>
-                        {agent.isVerified && (
-                          <Badge variant="secondary" className="text-xs">
-                            인증됨
-                          </Badge>
-                        )}
+
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : filteredAgents.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            검색 결과가 없습니다
+          </div>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredAgents.map((agent) => {
+              const isInstalled = installedAgents.has(agent.id);
+              const isInstalling = installing === agent.id;
+
+              return (
+                <Card
+                  key={agent.id}
+                  className="group transition-shadow hover:shadow-md"
+                >
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <CardTitle className="text-base">
+                            {agent.name}
+                          </CardTitle>
+                          {agent.isVerified && (
+                            <Badge variant="secondary" className="text-xs">
+                              인증됨
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {agent.author} 제작
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        {agent.author} 제작
-                      </p>
                     </div>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="line-clamp-2 mb-4">
-                  {agent.description}
-                </CardDescription>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                      {agent.rating}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Download className="h-4 w-4" />
-                      {(agent.downloads / 1000).toFixed(1)}k
-                    </span>
-                  </div>
-                  <Badge variant="outline">{agent.category}</Badge>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="line-clamp-2 mb-4">
+                      {agent.description}
+                    </CardDescription>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          {agent.rating}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Download className="h-4 w-4" />
+                          {(agent.downloads / 1000).toFixed(1)}k
+                        </span>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {agent.category === "research"
+                          ? "리서치"
+                          : agent.category === "development"
+                          ? "개발"
+                          : agent.category === "marketing"
+                          ? "마케팅"
+                          : agent.category === "analytics"
+                          ? "분석"
+                          : agent.category === "support"
+                          ? "지원"
+                          : agent.category === "legal"
+                          ? "법률"
+                          : agent.category}
+                      </Badge>
+                    </div>
+                    <Button
+                      className="w-full"
+                      size="sm"
+                      variant={isInstalled ? "secondary" : "default"}
+                      onClick={() => !isInstalled && handleInstall(agent)}
+                      disabled={isInstalled || isInstalling}
+                    >
+                      {isInstalling ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          설치 중...
+                        </>
+                      ) : isInstalled ? (
+                        <>
+                          <Check className="mr-2 h-4 w-4" />
+                          설치됨
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="mr-2 h-4 w-4" />
+                          설치
+                        </>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

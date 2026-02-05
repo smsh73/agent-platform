@@ -39,6 +39,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface KnowledgeBaseInfo {
   id: string;
@@ -340,17 +341,26 @@ export default function KnowledgePage() {
                       </div>
                     </div>
                     {kb.id !== "default" && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteKB(kb.id);
+                      <ConfirmDialog
+                        title="지식 베이스 삭제"
+                        description={`"${kb.name}"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없으며, 모든 문서가 삭제됩니다.`}
+                        confirmText="삭제"
+                        variant="destructive"
+                        onConfirm={async () => {
+                          await handleDeleteKB(kb.id);
                         }}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                        trigger={
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`${kb.name} 삭제`}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
+                          </Button>
+                        }
+                      />
                     )}
                   </div>
                 ))}
@@ -479,11 +489,15 @@ export default function KnowledgePage() {
                       onChange={(e) => setQuery(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleQuery()}
                     />
-                    <Button onClick={handleQuery} disabled={isQuerying}>
+                    <Button
+                      onClick={handleQuery}
+                      disabled={isQuerying}
+                      aria-label="지식 베이스 검색"
+                    >
                       {isQuerying ? (
-                        <RefreshCw className="h-4 w-4 animate-spin" />
+                        <RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" />
                       ) : (
-                        <Search className="h-4 w-4" />
+                        <Search className="h-4 w-4" aria-hidden="true" />
                       )}
                     </Button>
                   </div>

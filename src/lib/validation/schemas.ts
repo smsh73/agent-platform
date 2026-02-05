@@ -51,7 +51,7 @@ export const WorkflowNodeSchema = z.object({
     x: z.number(),
     y: z.number(),
   }),
-  data: z.record(z.any()),
+  data: z.record(z.string(), z.any()),
 });
 
 export const WorkflowEdgeSchema = z.object({

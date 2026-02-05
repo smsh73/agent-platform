@@ -6,6 +6,7 @@ import {
   getRateLimitIdentifier,
   getRateLimitHeaders,
   RateLimits,
+  type RateLimitConfig,
 } from "@/lib/middleware/rate-limiter";
 
 export async function middleware(request: NextRequest) {
@@ -67,7 +68,7 @@ export async function middleware(request: NextRequest) {
     const identifier = getRateLimitIdentifier(request, session?.user?.id);
 
     // Determine rate limit config based on path
-    let rateLimitConfig = RateLimits.DEFAULT;
+    let rateLimitConfig: RateLimitConfig = RateLimits.DEFAULT;
     const path = request.nextUrl.pathname;
 
     if (path.includes("/api/chat")) {

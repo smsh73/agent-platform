@@ -1,26 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getKnowledgeBase, listKnowledgeBases, deleteKnowledgeBase } from "@/lib/rag/hybrid-search";
 import { ingestDocument, queryKnowledgeBase, deleteDocumentFromKnowledgeBase } from "@/lib/rag";
+import { requireAuth } from "@/lib/middleware/auth-guard";
+import { handleApiError } from "@/lib/errors/error-handler";
 
 // GET /api/knowledge-base - List all knowledge bases
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    // Require authentication
+    const authResult = await requireAuth(req);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response
+    }
+
     const knowledgeBases = listKnowledgeBases();
     return NextResponse.json({
       success: true,
       knowledgeBases,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to list knowledge bases" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // POST /api/knowledge-base - Create new knowledge base or ingest document
 export async function POST(req: NextRequest) {
   try {
+    // Require authentication
+    const authResult = await requireAuth(req);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response
+    }
+
     const contentType = req.headers.get("content-type") || "";
 
     if (contentType.includes("multipart/form-data")) {
@@ -71,19 +82,19 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    return NextResponse.json(
-      {
-        error: "Failed to process request",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
 // DELETE /api/knowledge-base - Delete knowledge base
 export async function DELETE(req: NextRequest) {
   try {
+    // Require authentication
+    const authResult = await requireAuth(req);
+    if (authResult instanceof NextResponse) {
+      return authResult; // Return error response
+    }
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
 
@@ -101,9 +112,6 @@ export async function DELETE(req: NextRequest) {
       message: `Knowledge base ${id} deleted`,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to delete knowledge base" },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

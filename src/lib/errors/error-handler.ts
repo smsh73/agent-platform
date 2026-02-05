@@ -43,7 +43,7 @@ export function handleApiError(error: unknown): NextResponse<ErrorResponse> {
         code: "VALIDATION_ERROR",
         details:
           process.env.NODE_ENV === "development"
-            ? error.errors.map((err) => ({
+            ? error.issues.map((err) => ({
                 path: err.path.join("."),
                 message: err.message,
               }))

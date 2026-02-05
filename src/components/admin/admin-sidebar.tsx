@@ -52,6 +52,7 @@ const adminNavItems = [
   {
     title: "Agents",
     href: "/admin/agents",
+    icon: Database,
   },
 ];
 

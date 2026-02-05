@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ChatInput } from "@/components/chat/chat-input";
 import { ChatMessage } from "@/components/chat/chat-message";
 import { ModelSelector } from "@/components/chat/model-selector";
@@ -188,12 +189,22 @@ function ChatContent() {
               {currentAgent.name}
             </Badge>
           ) : null}
-          <Button variant="outline" size="sm" onClick={clearMessages}>
-            <Plus className="mr-1 h-4 w-4" />
-            새 대화
-          </Button>
-          <Button variant="ghost" size="sm">
-            <History className="mr-1 h-4 w-4" />
+          <ConfirmDialog
+            title="새 대화 시작"
+            description="현재 대화 내용이 지워집니다. 계속하시겠습니까?"
+            confirmText="새 대화"
+            onConfirm={async () => {
+              clearMessages();
+            }}
+            trigger={
+              <Button variant="outline" size="sm">
+                <Plus className="mr-1 h-4 w-4" aria-hidden="true" />
+                새 대화
+              </Button>
+            }
+          />
+          <Button variant="ghost" size="sm" aria-label="대화 기록 보기">
+            <History className="mr-1 h-4 w-4" aria-hidden="true" />
             기록
           </Button>
         </div>
@@ -236,14 +247,25 @@ function ChatContent() {
             />
           )}
           {displayMessages.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearMessages}
-              className="text-destructive hover:text-destructive"
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
+            <ConfirmDialog
+              title="대화 삭제"
+              description="모든 대화 내용이 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+              confirmText="삭제"
+              variant="destructive"
+              onConfirm={async () => {
+                clearMessages();
+              }}
+              trigger={
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive"
+                  aria-label="대화 삭제"
+                >
+                  <Trash2 className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              }
+            />
           )}
         </div>
       </div>

@@ -17,8 +17,10 @@ import {
   ApiKeyError,
   DatabaseError,
   ExternalApiError,
+  ValidationError,
 } from "@/lib/errors/api-errors";
 import { NextResponse } from "next/server";
+import { validatePrompt } from "@/lib/security/prompt-validator";
 
 export const maxDuration = 60;
 
@@ -30,6 +32,21 @@ export async function POST(req: Request) {
     // Validate request with Zod schema
     const validatedData = ChatRequestSchema.parse(body);
     const { messages, model: modelId, conversationId } = validatedData;
+
+    // Validate user messages for prompt injection
+    const sanitizedMessages = messages.map((msg) => {
+      if (msg.role === "user") {
+        try {
+          const sanitized = validatePrompt(msg.content, { strict: true });
+          return { ...msg, content: sanitized };
+        } catch (error) {
+          throw new ValidationError(
+            "Your message contains patterns that could be harmful. Please rephrase your request."
+          );
+        }
+      }
+      return msg;
+    });
 
     // Get the appropriate provider
     const provider = getProviderFromModel(modelId);
@@ -47,7 +64,7 @@ export async function POST(req: Request) {
     // Stream the response
     const result = streamText({
       model,
-      messages,
+      messages: sanitizedMessages,
       onFinish: async ({ text, usage }) => {
         // Save to database (if logged in)
         if (session?.user?.id) {
