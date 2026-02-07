@@ -72,7 +72,7 @@ const agents = [
     name: "Code Reviewer",
     description: "Automated code review with best practices suggestions",
     creator: "developer@tech.io",
-    model: "claude-3-5-sonnet-latest",
+    model: "claude-sonnet-4-5-20250929",
     isPublic: true,
     isApproved: true,
     isFeatured: false,

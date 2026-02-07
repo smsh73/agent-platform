@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, Suspense, useState } from "react";
-import { Plus, History, Trash2, MessageSquare, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, History, Trash2, MessageSquare, ChevronDown, ChevronUp, PanelLeftClose, PanelLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -11,7 +11,9 @@ import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { ChatInput } from "@/components/chat/chat-input";
 import { ChatMessage } from "@/components/chat/chat-message";
 import { ModelSelector } from "@/components/chat/model-selector";
+import { ConversationHistory } from "@/components/chat/conversation-history";
 import { ChatProvider, useChatContext, Message } from "@/components/chat/chat-provider";
+import { cn } from "@/lib/utils";
 import {
   Collapsible,
   CollapsibleContent,
@@ -147,17 +149,21 @@ function MoAAnalysisPanel({ message }: { message: Message }) {
 
 function ChatContent() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [showHistory, setShowHistory] = useState(false);
   const {
     messages,
     isLoading,
     selectedModel,
     currentAgent,
     isMoAMode,
+    currentConversationId,
     sendMessage,
     setSelectedModel,
     setMoAMode,
     clearMessages,
     stopGeneration,
+    loadConversation,
+    createNewConversation,
   } = useChatContext();
 
   // 시스템 메시지 제외한 메시지 (표시용)
@@ -179,35 +185,55 @@ function ChatContent() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)] flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b px-4 py-2">
-        <div className="flex items-center gap-2">
-          {currentAgent ? (
-            <Badge variant="secondary" className="flex items-center gap-1 py-1.5 px-3">
-              <MessageSquare className="h-3 w-3" />
-              {currentAgent.name}
-            </Badge>
-          ) : null}
-          <ConfirmDialog
-            title="새 대화 시작"
-            description="현재 대화 내용이 지워집니다. 계속하시겠습니까?"
-            confirmText="새 대화"
-            onConfirm={async () => {
-              clearMessages();
-            }}
-            trigger={
-              <Button variant="outline" size="sm">
-                <Plus className="mr-1 h-4 w-4" aria-hidden="true" />
-                새 대화
-              </Button>
-            }
+    <div className="flex h-[calc(100vh-3.5rem)]">
+      {/* Conversation History Sidebar */}
+      <div
+        className={cn(
+          "border-r transition-all duration-300",
+          showHistory ? "w-80" : "w-0 border-0"
+        )}
+      >
+        {showHistory && (
+          <ConversationHistory
+            currentConversationId={currentConversationId || undefined}
+            onSelectConversation={loadConversation}
+            onNewConversation={createNewConversation}
           />
-          <Button variant="ghost" size="sm" aria-label="대화 기록 보기">
-            <History className="mr-1 h-4 w-4" aria-hidden="true" />
-            기록
-          </Button>
-        </div>
+        )}
+      </div>
+
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b px-4 py-2">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowHistory(!showHistory)}
+              aria-label={showHistory ? "대화 기록 숨기기" : "대화 기록 보기"}
+            >
+              {showHistory ? (
+                <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <PanelLeft className="h-4 w-4" aria-hidden="true" />
+              )}
+            </Button>
+            {currentAgent ? (
+              <Badge variant="secondary" className="flex items-center gap-1 py-1.5 px-3">
+                <MessageSquare className="h-3 w-3" />
+                {currentAgent.name}
+              </Badge>
+            ) : null}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={createNewConversation}
+            >
+              <Plus className="mr-1 h-4 w-4" aria-hidden="true" />
+              새 대화
+            </Button>
+          </div>
         <div className="flex items-center gap-3">
           {/* MoA 토글 */}
           <TooltipProvider>
@@ -370,19 +396,20 @@ function ChatContent() {
         )}
       </ScrollArea>
 
-      {/* Input */}
-      <ChatInput
-        onSend={handleSend}
-        isLoading={isLoading}
-        onStop={stopGeneration}
-        placeholder={
-          isMoAMode
-            ? "Mixture of Agents에게 질문하기..."
-            : currentAgent
-            ? `${currentAgent.name}에게 메시지 보내기...`
-            : `${selectedModel}에게 메시지 보내기...`
-        }
-      />
+        {/* Input */}
+        <ChatInput
+          onSend={handleSend}
+          isLoading={isLoading}
+          onStop={stopGeneration}
+          placeholder={
+            isMoAMode
+              ? "Mixture of Agents에게 질문하기..."
+              : currentAgent
+              ? `${currentAgent.name}에게 메시지 보내기...`
+              : `${selectedModel}에게 메시지 보내기...`
+          }
+        />
+      </div>
     </div>
   );
 }

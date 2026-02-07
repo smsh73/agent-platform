@@ -45,7 +45,12 @@ next-env.d.ts
 # Development files
 dev-server.log
 *.log
+check-user.js
 
 # Database
 prisma/*.db
 prisma/*.db-journal
+
+# OCI Wallet (sensitive credentials)
+oci/wallet/
+oci/container-config.json

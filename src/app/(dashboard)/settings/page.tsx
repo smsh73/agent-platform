@@ -56,6 +56,7 @@ const API_PROVIDERS = [
 interface ProviderStatus {
   provider: string;
   isConfigured: boolean;
+  maskedKey: string | null;
   updatedAt: string | null;
 }
 
@@ -227,6 +228,11 @@ export default function SettingsPage() {
                             <p className="text-sm text-muted-foreground">
                               {provider.description}
                             </p>
+                            {configured && providerStatus.find((p) => p.provider === provider.id)?.maskedKey && (
+                              <p className="text-xs text-muted-foreground font-mono mt-1">
+                                {providerStatus.find((p) => p.provider === provider.id)?.maskedKey}
+                              </p>
+                            )}
                           </div>
                         </div>
                         <Badge

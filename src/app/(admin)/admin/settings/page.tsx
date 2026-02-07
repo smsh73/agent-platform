@@ -196,7 +196,7 @@ export default function SettingsPage() {
                     <SelectContent>
                       <SelectItem value="gpt-4o">GPT-4o (OpenAI)</SelectItem>
                       <SelectItem value="gpt-4o-mini">GPT-4o Mini (OpenAI)</SelectItem>
-                      <SelectItem value="claude-3-5-sonnet-latest">
+                      <SelectItem value="claude-sonnet-4-5-20250929">
                         Claude 3.5 Sonnet (Anthropic)
                       </SelectItem>
                       <SelectItem value="gemini-1.5-pro">

@@ -41,7 +41,7 @@ export interface MoAConfig {
   // Orchestrator: 응답 분석 및 최적 파트 선별
   orchestrator: {
     provider: "anthropic";
-    model: "claude-3-5-sonnet-latest";
+    model: "claude-sonnet-4-5-20250929";
   };
   // Narrator: 최종 답변 합성
   narrator: {
@@ -63,7 +63,7 @@ export interface MoAConfig {
 export const DEFAULT_MOA_CONFIG: MoAConfig = {
   orchestrator: {
     provider: "anthropic",
-    model: "claude-3-5-sonnet-latest",
+    model: "claude-sonnet-4-5-20250929",
   },
   narrator: {
     provider: "openai",
@@ -75,7 +75,7 @@ export const DEFAULT_MOA_CONFIG: MoAConfig = {
   },
   agents: [
     { provider: "openai", model: "gpt-4o" },
-    { provider: "anthropic", model: "claude-3-5-sonnet-latest" },
+    { provider: "anthropic", model: "claude-sonnet-4-5-20250929" },
     { provider: "google", model: "gemini-1.5-pro" },
   ],
 };

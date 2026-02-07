@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Search, MoreHorizontal, Play, Presentation, FileSearch, FileSpreadsheet, ArrowRight, Loader2, Trash2 } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Play, ArrowRight, Loader2, Trash2, FileSearch } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -25,49 +25,34 @@ import {
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import type { Agent } from "@/types/agents";
 
-const PROVIDER_COLORS: Record<string, string> = {
-  openai: "bg-green-500/10 text-green-600",
-  anthropic: "bg-orange-500/10 text-orange-600",
-  google: "bg-blue-500/10 text-blue-600",
-  perplexity: "bg-purple-500/10 text-purple-600",
-};
-
 // Super Agents - 내장 에이전트
 const superAgents = [
   {
     id: "moa",
     name: "Mixture of Agents",
     description: "GPT-4o, Claude, Gemini가 동시에 응답하고 최고의 답변을 조합합니다",
-    icon: FileSearch,
     href: "/chat?moa=true",
-    color: "from-yellow-500 to-orange-500",
     features: ["멀티 AI 동시 실행", "응답 분석 & 선별", "최신 정보 검색", "Best Answer 합성"],
   },
   {
     id: "slides",
     name: "AI 슬라이드",
     description: "프롬프트를 입력하면 전문적인 프레젠테이션을 자동 생성합니다",
-    icon: Presentation,
     href: "/slides",
-    color: "from-blue-500 to-cyan-500",
     features: ["AI 슬라이드 생성", "6가지 테마", "실시간 편집", "발표 모드"],
   },
   {
     id: "research",
     name: "Agentic Research",
     description: "심층 조사를 수행하고 체계적인 보고서를 자동 작성합니다",
-    icon: FileSearch,
     href: "/research",
-    color: "from-purple-500 to-pink-500",
     features: ["퀵/표준/심층 리서치", "마크다운 보고서", "히스토리 저장"],
   },
   {
     id: "sheets",
     name: "AI 시트",
     description: "웹 리서치를 수행하고 데이터를 스프레드시트로 자동 정리합니다",
-    icon: FileSpreadsheet,
     href: "/sheets",
-    color: "from-green-500 to-emerald-500",
     features: ["데이터 자동 수집", "차트 시각화", "CSV 내보내기", "실시간 편집"],
   },
 ];
@@ -162,26 +147,18 @@ export default function AgentsPage() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {superAgents.map((agent) => (
             <Link key={agent.id} href={agent.href}>
-              <Card className="group relative overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1">
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${agent.color} opacity-5 group-hover:opacity-10 transition-opacity`}
-                />
+              <Card className="group transition-all hover:shadow-md hover:border-primary/50">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <div
-                      className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${agent.color}`}
-                    >
-                      <agent.icon className="h-6 w-6 text-white" />
-                    </div>
+                    <CardTitle className="text-lg">{agent.name}</CardTitle>
                     <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
-                  <CardTitle className="text-lg mt-3">{agent.name}</CardTitle>
                   <CardDescription>{agent.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex flex-wrap gap-2">
                     {agent.features.map((feature) => (
-                      <Badge key={feature} variant="outline" className="text-xs">
+                      <Badge key={feature} variant="secondary" className="text-xs">
                         {feature}
                       </Badge>
                     ))}
@@ -237,10 +214,7 @@ export default function AgentsPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <CardTitle className="text-base mb-1">{agent.name}</CardTitle>
-                    <Badge
-                      variant="secondary"
-                      className={PROVIDER_COLORS[agent.provider]}
-                    >
+                    <Badge variant="secondary" className="text-xs">
                       {agent.model}
                     </Badge>
                   </div>

@@ -1,0 +1,78 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage
+.nyc_output
+
+# Next.js
+.next/
+out/
+build
+dist
+
+# Production
+.vercel
+.env*.local
+.env.production
+
+# Misc
+.DS_Store
+*.pem
+*.log
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor directories and files
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+CHANGELOG.md
+docs/
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Scripts
+check-user.js
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# Keep wallet but exclude other OCI files
+oci/init-db.js
+oci/schema.sql
+oci/setup-oci.sh
+oci/deploy-to-registry.sh
+oci/deploy-container.sh
+oci/container-config.json
+oci/README.md
+oci/QUICKSTART.md
+oci/setup-database.md

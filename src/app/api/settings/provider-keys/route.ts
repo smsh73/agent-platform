@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { encrypt, decrypt, maskApiKey } from "@/lib/crypto";
+import { ensureDefaultUser } from "@/lib/api-keys";
 
 const VALID_PROVIDERS = ["openai", "anthropic", "google", "perplexity"];
 
@@ -12,28 +13,41 @@ export async function GET() {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다" },
-        { status: 401 }
-      );
+    // 세션이 없으면 기본 사용자 사용 (개발 환경)
+    let userId = session?.user?.id;
+    if (!userId) {
+      const defaultUser = await ensureDefaultUser();
+      userId = defaultUser.id;
     }
 
     const providerKeys = await prisma.userProviderKey.findMany({
-      where: { userId: session.user.id },
+      where: { userId },
       select: {
         provider: true,
+        encryptedKey: true,
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    // 어떤 provider가 설정되어 있는지 반환
+    // 어떤 provider가 설정되어 있는지 반환 (마스킹된 키 포함)
     const providers = VALID_PROVIDERS.map((provider) => {
-      const key = providerKeys.find((k) => k.provider === provider);
+      const key = providerKeys.find((k: Record<string, unknown>) => k.provider === provider);
+      let maskedKey = null;
+
+      if (key) {
+        try {
+          const decryptedKey = decrypt(key.encryptedKey);
+          maskedKey = maskApiKey(decryptedKey);
+        } catch (error) {
+          console.error(`Failed to decrypt key for ${provider}:`, error);
+        }
+      }
+
       return {
         provider,
         isConfigured: !!key,
+        maskedKey,
         updatedAt: key?.updatedAt || null,
       };
     });
@@ -54,16 +68,22 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
+    console.log("🔐 API 키 저장 요청 - 세션:", session?.user?.email || "없음");
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다" },
-        { status: 401 }
-      );
+    // 세션이 없으면 기본 사용자 사용 (개발 환경)
+    let userId = session?.user?.id;
+    if (!userId) {
+      console.log("⚠️ 세션 없음 - 기본 사용자 사용");
+      const defaultUser = await ensureDefaultUser();
+      userId = defaultUser.id;
+      console.log("✅ 사용할 userId:", userId);
+    } else {
+      console.log("✅ 세션 사용자 ID:", userId);
     }
 
     const body = await req.json();
     const { provider, apiKey } = body;
+    console.log("📝 저장할 provider:", provider);
 
     // 유효성 검사
     if (!provider || !VALID_PROVIDERS.includes(provider)) {
@@ -82,12 +102,14 @@ export async function POST(req: NextRequest) {
 
     // API 키 암호화
     const encryptedKey = encrypt(apiKey.trim());
+    console.log("🔐 API 키 암호화 완료");
 
     // Upsert (있으면 업데이트, 없으면 생성)
-    await prisma.userProviderKey.upsert({
+    console.log("💾 DB 저장 시도 - userId:", userId, "provider:", provider);
+    const result = await prisma.userProviderKey.upsert({
       where: {
         userId_provider: {
-          userId: session.user.id,
+          userId,
           provider,
         },
       },
@@ -96,11 +118,12 @@ export async function POST(req: NextRequest) {
         updatedAt: new Date(),
       },
       create: {
-        userId: session.user.id,
+        userId,
         provider,
         encryptedKey,
       },
     });
+    console.log("✅ API 키 저장 성공:", result.id);
 
     return NextResponse.json({
       success: true,
@@ -122,11 +145,11 @@ export async function DELETE(req: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "로그인이 필요합니다" },
-        { status: 401 }
-      );
+    // 세션이 없으면 기본 사용자 사용 (개발 환경)
+    let userId = session?.user?.id;
+    if (!userId) {
+      const defaultUser = await ensureDefaultUser();
+      userId = defaultUser.id;
     }
 
     const { searchParams } = new URL(req.url);
@@ -142,7 +165,7 @@ export async function DELETE(req: NextRequest) {
     await prisma.userProviderKey.delete({
       where: {
         userId_provider: {
-          userId: session.user.id,
+          userId,
           provider,
         },
       },

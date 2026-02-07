@@ -24,11 +24,14 @@ interface ChatContextValue {
   selectedModel: string;
   currentAgent: AgentConfig | null;
   isMoAMode: boolean;
+  currentConversationId: string | null;
   sendMessage: (content: string) => Promise<void>;
   setSelectedModel: (model: string) => void;
   setMoAMode: (enabled: boolean) => void;
   clearMessages: () => void;
   stopGeneration: () => void;
+  loadConversation: (conversationId: string) => Promise<void>;
+  createNewConversation: () => Promise<void>;
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null);
@@ -56,6 +59,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [currentAgent, setCurrentAgent] = useState<AgentConfig | null>(null);
   const [isMoAMode, setMoAMode] = useState(moaParam === "true");
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
   // 에이전트 로드
   useEffect(() => {
@@ -92,7 +96,7 @@ export function ChatProvider({ children }: ChatProviderProps) {
     const assistantMessage: Message = {
       id: crypto.randomUUID(),
       role: "assistant",
-      content: "🔄 Mixture of Agents 실행 중...\n\n⏳ 여러 AI 모델에서 동시에 응답을 수집하고 있습니다...",
+      content: "Mixture of Agents를 실행하고 있습니다.\n\n여러 AI 모델에서 동시에 응답을 생성 중입니다...",
     };
 
     setMessages((prev) => [...prev, userMessage, assistantMessage]);
@@ -279,6 +283,88 @@ export function ChatProvider({ children }: ChatProviderProps) {
     }
   }, [abortController]);
 
+  // 메시지를 데이터베이스에 저장
+  const saveMessageToDB = useCallback(async (role: string, content: string) => {
+    if (!currentConversationId) return;
+
+    try {
+      await fetch(`/api/conversations/${currentConversationId}/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          role,
+          content,
+          model: selectedModel,
+        }),
+      });
+    } catch (error) {
+      console.error("Failed to save message:", error);
+    }
+  }, [currentConversationId, selectedModel]);
+
+  // 대화 불러오기
+  const loadConversation = useCallback(async (conversationId: string) => {
+    try {
+      const res = await fetch(`/api/conversations/${conversationId}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setCurrentConversationId(conversationId);
+        setMessages(data.conversation.messages.map((msg: any) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+        })));
+        setSelectedModel(data.conversation.model);
+      }
+    } catch (error) {
+      console.error("Failed to load conversation:", error);
+    }
+  }, []);
+
+  // 새 대화 생성
+  const createNewConversation = useCallback(async () => {
+    try {
+      const res = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "새 대화",
+          model: selectedModel,
+          provider: "OPENAI",
+          agentId: currentAgent?.id,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setCurrentConversationId(data.conversation.id);
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error("Failed to create conversation:", error);
+    }
+  }, [selectedModel, currentAgent]);
+
+  // 메시지가 추가될 때마다 데이터베이스에 저장
+  useEffect(() => {
+    const latestMessage = messages[messages.length - 1];
+    if (latestMessage && latestMessage.role !== "system" && currentConversationId) {
+      // 스트리밍 중이 아닐 때만 저장 (isLoading이 false일 때)
+      if (!isLoading) {
+        saveMessageToDB(latestMessage.role, latestMessage.content);
+      }
+    }
+  }, [messages, isLoading, currentConversationId, saveMessageToDB]);
+
+  // 초기 대화 생성
+  useEffect(() => {
+    if (!currentConversationId && messages.length === 0 && !agentId) {
+      createNewConversation();
+    }
+  }, [currentConversationId, messages.length, agentId, createNewConversation]);
+
   return (
     <ChatContext.Provider
       value={{
@@ -287,11 +373,14 @@ export function ChatProvider({ children }: ChatProviderProps) {
         selectedModel,
         currentAgent,
         isMoAMode,
+        currentConversationId,
         sendMessage,
         setSelectedModel,
         setMoAMode,
         clearMessages,
         stopGeneration,
+        loadConversation,
+        createNewConversation,
       }}
     >
       {children}

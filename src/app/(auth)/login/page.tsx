@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Sparkles, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,9 +57,6 @@ function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-          <Sparkles className="h-6 w-6" />
-        </div>
         <CardTitle className="text-2xl">로그인</CardTitle>
         <CardDescription>
           Agent Platform에 오신 것을 환영합니다
@@ -145,9 +142,6 @@ export default function LoginPage() {
         fallback={
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-                <Sparkles className="h-6 w-6" />
-              </div>
               <CardTitle className="text-2xl">로딩 중...</CardTitle>
             </CardHeader>
           </Card>

@@ -65,7 +65,7 @@ export const ChatMessage = memo(function ChatMessage({
           <ReactMarkdown
             components={{
               pre: ({ children }) => (
-                <pre className="overflow-x-auto rounded-lg bg-zinc-900 p-4">
+                <pre className="overflow-x-auto rounded-lg bg-zinc-900 text-zinc-100 p-4">
                   {children}
                 </pre>
               ),
@@ -79,7 +79,7 @@ export const ChatMessage = memo(function ChatMessage({
                     {children}
                   </code>
                 ) : (
-                  <code className={className} {...props}>
+                  <code className={cn(className, "text-zinc-100")} {...props}>
                     {children}
                   </code>
                 );

@@ -177,10 +177,7 @@ export function WorkflowBuilder({
                   onClick={() => addNode(def.type)}
                   className="w-full flex items-center gap-2 p-2 rounded-md hover:bg-muted transition-colors text-left"
                 >
-                  <div
-                    className="w-8 h-8 rounded flex items-center justify-center text-white text-sm"
-                    style={{ backgroundColor: def.color }}
-                  >
+                  <div className="w-8 h-8 rounded flex items-center justify-center bg-secondary text-secondary-foreground text-sm">
                     {def.icon}
                   </div>
                   <div>
@@ -296,7 +293,7 @@ function NodeConfigPanel({
   return (
     <div className="space-y-4">
       <div>
-        <Badge style={{ backgroundColor: definition.color }}>
+        <Badge variant="secondary">
           {definition.label}
         </Badge>
       </div>
@@ -323,8 +320,8 @@ function NodeConfigPanel({
             >
               <option value="gpt-4o">GPT-4o</option>
               <option value="gpt-4o-mini">GPT-4o Mini</option>
-              <option value="claude-3-5-sonnet-latest">Claude 3.5 Sonnet</option>
-              <option value="claude-3-5-haiku-latest">Claude 3.5 Haiku</option>
+              <option value="claude-sonnet-4-5-20250929">Claude 3.5 Sonnet</option>
+              <option value="claude-sonnet-4-20250514">Claude 3.5 Haiku</option>
               <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
               <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
             </select>

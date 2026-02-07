@@ -284,7 +284,7 @@ async function claudeNarrative(
   }
 
   try {
-    const model = getModelWithKey("claude-3-5-sonnet-latest", apiKey);
+    const model = getModelWithKey("claude-sonnet-4-5-20250929", apiKey);
 
     const result = await generateText({
       model,

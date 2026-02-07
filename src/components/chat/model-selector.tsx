@@ -21,8 +21,8 @@ const MODELS = {
     { id: "o1-mini", name: "o1 Mini", description: "Fast reasoning" },
   ],
   anthropic: [
-    { id: "claude-3-5-sonnet-latest", name: "Claude 3.5 Sonnet", description: "Best balance" },
-    { id: "claude-3-5-haiku-latest", name: "Claude 3.5 Haiku", description: "Fast and efficient" },
+    { id: "claude-sonnet-4-5-20250929", name: "Claude 3.5 Sonnet", description: "Best balance" },
+    { id: "claude-sonnet-4-20250514", name: "Claude 3.5 Haiku", description: "Fast and efficient" },
     { id: "claude-3-opus-latest", name: "Claude 3 Opus", description: "Most powerful" },
   ],
   google: [

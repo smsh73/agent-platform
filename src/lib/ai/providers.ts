@@ -46,14 +46,14 @@ export const MODELS = {
     "o1-mini": { name: "o1 Mini", provider: "openai", maxTokens: 128000 },
   },
   anthropic: {
-    "claude-3-5-sonnet-latest": { name: "Claude 3.5 Sonnet", provider: "anthropic", maxTokens: 200000 },
-    "claude-3-5-haiku-latest": { name: "Claude 3.5 Haiku", provider: "anthropic", maxTokens: 200000 },
-    "claude-3-opus-latest": { name: "Claude 3 Opus", provider: "anthropic", maxTokens: 200000 },
+    "claude-sonnet-4-5-20250929": { name: "Claude Sonnet 4.5", provider: "anthropic", maxTokens: 200000 },
+    "claude-sonnet-4-20250514": { name: "Claude Sonnet 4", provider: "anthropic", maxTokens: 200000 },
+    "claude-opus-4-20250514": { name: "Claude Opus 4", provider: "anthropic", maxTokens: 200000 },
   },
   google: {
-    "gemini-2.0-flash-exp": { name: "Gemini 2.0 Flash", provider: "google", maxTokens: 1000000 },
     "gemini-1.5-pro": { name: "Gemini 1.5 Pro", provider: "google", maxTokens: 2000000 },
     "gemini-1.5-flash": { name: "Gemini 1.5 Flash", provider: "google", maxTokens: 1000000 },
+    "gemini-2.0-flash-exp": { name: "Gemini 2.0 Flash (Exp)", provider: "google", maxTokens: 1000000 },
   },
   perplexity: {
     "llama-3.1-sonar-large-128k-online": { name: "Sonar Large (Online)", provider: "perplexity", maxTokens: 128000 },

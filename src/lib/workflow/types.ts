@@ -242,7 +242,7 @@ export const NODE_DEFINITIONS: NodeDefinition[] = [
         type: "select",
         options: [
           { label: "GPT-4o", value: "gpt-4o" },
-          { label: "Claude 3.5 Sonnet", value: "claude-3-5-sonnet-latest" },
+          { label: "Claude 3.5 Sonnet", value: "claude-sonnet-4-5-20250929" },
           { label: "Gemini 1.5 Pro", value: "gemini-1.5-pro" },
         ],
         required: true,

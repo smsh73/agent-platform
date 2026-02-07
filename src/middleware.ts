@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@/lib/auth";
+import { getToken } from "next-auth/jwt";
 import {
   checkRateLimit,
   getRateLimitIdentifier,
@@ -63,9 +63,9 @@ export async function middleware(request: NextRequest) {
       });
     }
 
-    // Rate limiting for API routes
-    const session = await auth();
-    const identifier = getRateLimitIdentifier(request, session?.user?.id);
+    // Rate limiting for API routes (Edge-compatible JWT token check)
+    const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+    const identifier = getRateLimitIdentifier(request, token?.id as string | undefined);
 
     // Determine rate limit config based on path
     let rateLimitConfig: RateLimitConfig = RateLimits.DEFAULT;

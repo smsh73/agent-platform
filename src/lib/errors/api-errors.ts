@@ -45,6 +45,16 @@ export class AuthorizationError extends ApiError {
 }
 
 /**
+ * 403 - Forbidden (Alias for AuthorizationError)
+ */
+export class ForbiddenError extends ApiError {
+  constructor(action: string = "perform this action") {
+    super(`You don't have permission to ${action}`, 403, "FORBIDDEN");
+    this.name = "ForbiddenError";
+  }
+}
+
+/**
  * 404 - Not Found
  */
 export class NotFoundError extends ApiError {

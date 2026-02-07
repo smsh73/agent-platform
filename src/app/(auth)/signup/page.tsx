@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Sparkles, Eye, EyeOff, Loader2, Check } from "lucide-react";
+import { Eye, EyeOff, Loader2, Check } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,9 +82,6 @@ export default function SignupPage() {
       <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-green-500 text-white">
-              <Check className="h-6 w-6" />
-            </div>
             <CardTitle className="text-2xl">회원가입 완료!</CardTitle>
             <CardDescription>
               로그인 페이지로 이동합니다...
@@ -99,9 +96,6 @@ export default function SignupPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Sparkles className="h-6 w-6" />
-          </div>
           <CardTitle className="text-2xl">회원가입</CardTitle>
           <CardDescription>
             Agent Platform 계정을 만드세요
